@@ -4,34 +4,51 @@ import { Container, } from "@mui/system";
 import TextField from "@mui/material/TextField";
 import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button';
-import { InputAdornment, RatingClassKey, Stack } from "@mui/material";
+import { AlertTitle, Collapse, IconButton, InputAdornment, LinearProgress, RatingClassKey, Stack } from "@mui/material";
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { FormControl, FormLabel, FormControlLabel, RadioGroup, Radio } from '@mui/material';
+import { Alert } from '@mui/material';
 import axios from 'axios';
+import "./home.css"
 
 function Home() {
-    const [valueDatePickerInicio, setValueDatePickerInicio] = useState<Dayjs>(dayjs());
+    const [valueDatePickerInicio, setValueDatePickerInicio] = useState<Dayjs>(dayjs().startOf('day'));
     const [valueDatePickerFinal, setValueDatePickerFinal] = useState<Dayjs>(dayjs());
     const [valueSearchExpression, setValueSearchExpression] = useState('')
     const [valueRadio, setValueRadio] = useState('')
+    const [button, setButton] = useState(true)
+    const [isOpen, setIsOpen] = useState(false)
+    const [alertText, setAlertText] = useState("")
+    const [alertTextSuccess, setAlertSuccess] = useState("")
+    const [alertSuccessIsOpen, setAlertSuccesIsOpen] = useState(false)
+    const [linearShow, setLinearShow] = useState(false)
 
-    async function postOnBack() {
-        axios.post("http://localhost:3001/api/v1/download", {
-            "fileData": "eu adoro meus amigos de serviço, Lu levou o macarrão integral hoje pra eu comer no almoço, ainda colocou carne moída (que ela não gosta, só pra ficar mais gostoso pra mim) e um bife de porco maravilhoso. É sobre ❤️\n\npoxa eu adoro meus amigos\n\nMds eu adoro meus amigos tá doido",
+
+    async function downloadTextFile() {
+        const response = await axios.post("http://localhost:3001/api/v1/download", {
+            "fileData": "eu adoro meus amigos de serviço, Lu levou o macarrão integral hoje pra eu comer no almoço, ainda colocou carne moída (que ela não gosta, só pra ficar mais gostoso pra mim) e um bife de porco maravilhoso. É sobre ❤\n\npoxa eu adoro meus amigos\n\nMds eu adoro meus amigos tá doido",
             "fileType": "txt",
             "fileName": "asdsaf"
-        })
+        }, { responseType: 'blob' });
+
+        const type = response.headers['content-type']
+        const blob = new Blob([response.data], { type: type })
+
+        const link = document.createElement('a')
+        link.href = window.URL.createObjectURL(blob)
+        link.download = 'test.txt'
+        link.click()
     }
 
     function validFieldValue() {
         let diference = valueDatePickerInicio!.diff(valueDatePickerFinal)
-        console.log(diference)
         if (diference > 0) {
-            window.alert("Insira uma data válida")
+            setAlertText("Insert a valid date")
+            setIsOpen(true)
             return false
         }
         return true
@@ -39,23 +56,41 @@ function Home() {
 
     async function postExpression(event: FormEvent<HTMLFormElement>) {
         event.preventDefault()
-
+        setLinearShow(true)
         if (validFieldValue()) {
-            await axios.post("http://localhost:3001/api/v1/search", {
-                start_time: valueDatePickerInicio?.toISOString(),
-                end_time: valueDatePickerFinal?.toISOString(),
-                query: valueSearchExpression,
-                sort_order: valueRadio,
-                max_result: 100
+            let response
+            try {
+                response = await axios.post("http://localhost:3001/api/v1/search", {
+                    query: valueSearchExpression,
+                    options : {
+                        start_time: valueDatePickerInicio?.toISOString(),
+                        end_time: valueDatePickerFinal?.toISOString(),
+                        sort_order: valueRadio,
+                        max_result: 100
+                    }
+                });
+                if(response.status == 200 && response.data.data.meta.result_count > 0){
+                    setButton(false)
+                    setAlertSuccesIsOpen(true)
+                    setAlertSuccess(`${response.data.data.meta.result_count} occurrences were found`)
+                }
+                else if(response.status == 200 && response.data.data.meta.result_count == 0){
+                    setAlertSuccesIsOpen(true)
+                    setAlertSuccess(`${response.data.data.meta.result_count} occurrences were found`)
+                }
             }
-            );
+            catch (error: any) {
+                setAlertText(`${error.response.data.data} : ${error.response.data.errorDetails}`)
+                setIsOpen(true)
+            }
+                
         }
+        setLinearShow(false)
     }
 
     const handleChangeRadio = (event: React.ChangeEvent<HTMLInputElement>) => {
         setValueRadio(event.target.value)
     }
-    console.log({ valueSearchExpression })
     const handleChangeSearchExpression = (event: React.ChangeEvent<HTMLInputElement>) => {
         setValueSearchExpression(event.target.value)
     }
@@ -65,6 +100,17 @@ function Home() {
             <Header />
             <div style={{ padding: "20px 0px" }}>
                 <Container maxWidth="xl">
+                <Collapse in={isOpen}>
+                <Alert
+                    className="alert-box"
+                    severity="error"
+                    onClose={() =>{
+                        setIsOpen(false)
+                      }}>
+                    <AlertTitle>Something gone wrong!</AlertTitle>
+                    {alertText}
+                </Alert>
+                </Collapse>
                     <form onSubmit={postExpression}>
                         <Stack spacing={3}>
                             <TextField
@@ -85,8 +131,7 @@ function Home() {
                                         value={valueDatePickerInicio}
                                         onChange={(newDateInicio: any) => {
                                             if (newDateInicio == undefined) {
-                                                setValueDatePickerInicio(dayjs())
-                                                console.log(valueDatePickerInicio)
+                                                setValueDatePickerInicio(dayjs().startOf('day'))
                                             }
                                             else {
                                                 setValueDatePickerInicio(newDateInicio)
@@ -98,11 +143,13 @@ function Home() {
                                         value={valueDatePickerFinal}
                                         onChange={(newDateFinal: any) => {
                                             if (newDateFinal == undefined) {
-                                                setValueDatePickerFinal(dayjs())
-                                                console.log(valueDatePickerFinal)
+                                                setValueDatePickerFinal(dayjs().endOf('day'))
                                             }
                                             else {
                                                 setValueDatePickerFinal(newDateFinal)
+                                            }
+                                            if(newDateFinal.startOf('day') == dayjs().startOf('day')){
+                                                setValueDatePickerFinal(dayjs())
                                             }
                                         }}
                                         renderInput={(params) => <TextField {...params} />} />
@@ -122,8 +169,22 @@ function Home() {
                                 </FormControl>
                             </LocalizationProvider>
                             <Button type="submit" variant="contained">Pesquisar expressões</Button>
-                        </Stack>
-                        <Button variant="contained">Baixar Ocorrrências</Button>
+                            <Collapse in={linearShow}>
+                                <LinearProgress/>
+                            </Collapse>
+                            <Collapse in={alertSuccessIsOpen}>
+                                <Alert
+                                    className="alert-box"
+                                    severity="success"
+                                    onClose={() =>{
+                                        setAlertSuccesIsOpen(false)
+                                    }}>
+                                    <AlertTitle>Research is completed!</AlertTitle>
+                                    {alertTextSuccess}
+                                </Alert>
+                            </Collapse>
+                                    </Stack>
+                        <Button variant="contained"disabled={button} onClick={downloadTextFile} color="secondary">Baixar Ocorrrências</Button>
                     </form>
                 </Container>
             </div>

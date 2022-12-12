@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
 import Header from "../components/header"
 import { Container, } from "@mui/system";
 import TextField from "@mui/material/TextField";
@@ -10,111 +10,121 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import {FormControl, FormLabel, FormControlLabel, RadioGroup, Radio} from '@mui/material';
+import { FormControl, FormLabel, FormControlLabel, RadioGroup, Radio } from '@mui/material';
 import axios from 'axios';
 
 function Home() {
-    const [valueDatePickerInicio, setValueDatePickerInicio] = useState<Dayjs | null>();
-    const [valueDatePickerFinal, setValueDatePickerFinal] = useState<Dayjs | null>();
+    const [valueDatePickerInicio, setValueDatePickerInicio] = useState<Dayjs>(dayjs());
+    const [valueDatePickerFinal, setValueDatePickerFinal] = useState<Dayjs>(dayjs());
     const [valueSearchExpression, setValueSearchExpression] = useState('')
     const [valueRadio, setValueRadio] = useState('')
-    /*async function postOnBack(){
-        const config = {
-            headers : {
-                "Access-Control-Expose-Headers" : "Content-Disposition",
-                "Content-Disposition" : "attachment; filename=testando.txt"
-            }
-        }
+
+    async function postOnBack() {
         axios.post("http://localhost:3001/api/v1/download", {
-            "fileData": "aa",
+            "fileData": "eu adoro meus amigos de serviço, Lu levou o macarrão integral hoje pra eu comer no almoço, ainda colocou carne moída (que ela não gosta, só pra ficar mais gostoso pra mim) e um bife de porco maravilhoso. É sobre ❤️\n\npoxa eu adoro meus amigos\n\nMds eu adoro meus amigos tá doido",
             "fileType": "txt",
-            "fileName": "Testando"
-        },config).then(res => res.blob()).then(blob => saveAs(blob, filename)
-    }*/
+            "fileName": "asdsaf"
+        })
+    }
 
-    function validFieldValue(){
-        //let datateste = valueDatePickerInicio.toISOString()
-        let startDate = new Date()
-
-        if(valueSearchExpression == ""){
-            window.alert("Preencha o campo de expressão!")
+    function validFieldValue() {
+        let diference = valueDatePickerInicio!.diff(valueDatePickerFinal)
+        console.log(diference)
+        if (diference > 0) {
+            window.alert("Insira uma data válida")
             return false
         }
-        /*if(){
-            window.alert("Insira uma data Válida")
-            return false
-        }*/
         return true
     }
 
-    async function postExpression(){
-        if(validFieldValue()){
+    async function postExpression(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault()
+
+        if (validFieldValue()) {
             await axios.post("http://localhost:3001/api/v1/search", {
-                start_time : valueDatePickerInicio,
-                end_time : valueDatePickerFinal,
-                query : valueSearchExpression,
-                sort_order : valueRadio,
-                max_result : 100
-                }
+                start_time: valueDatePickerInicio?.toISOString(),
+                end_time: valueDatePickerFinal?.toISOString(),
+                query: valueSearchExpression,
+                sort_order: valueRadio,
+                max_result: 100
+            }
             );
         }
     }
 
-    const handleChangeRadio = (event: React.ChangeEvent<HTMLInputElement>) =>{
+    const handleChangeRadio = (event: React.ChangeEvent<HTMLInputElement>) => {
         setValueRadio(event.target.value)
     }
-    console.log({valueSearchExpression})
-    const handleChangeSearchExpression = (event: React.ChangeEvent<HTMLInputElement>) =>{
+    console.log({ valueSearchExpression })
+    const handleChangeSearchExpression = (event: React.ChangeEvent<HTMLInputElement>) => {
         setValueSearchExpression(event.target.value)
     }
 
     return (
         <div>
             <Header />
-            <div style={{padding: "20px 0px"}}>
+            <div style={{ padding: "20px 0px" }}>
                 <Container maxWidth="xl">
-                    <Stack spacing={3}>
-                        <TextField
-                            id="outlined-basic"
-                            label="Insira uma expressão"
-                            variant="outlined"
-                            value={valueSearchExpression}
-                            onChange={handleChangeSearchExpression}
-                            InputProps={{endAdornment: <InputAdornment position="end"><SearchIcon/>
-                        </InputAdornment>}}/>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <Stack direction="row" spacing={3}>
-                                <DatePicker label="Início"
-                                    inputFormat="DD/MM/YYYY"
-                                    value={valueDatePickerInicio}
-                                    onChange={(newDateInicio: any)=>{
-                                        setValueDatePickerInicio(newDateInicio.toISOString())
-                                    }}
-                                    renderInput={(params) => <TextField {...params} />}/>
-                                <DatePicker label="Fim"
-                                    inputFormat="DD/MM/YYYY"
-                                    value={valueDatePickerFinal}
-                                    onChange={(newDateFinal: any)=>{
-                                        setValueDatePickerFinal(newDateFinal.toISOString())
-                                    }}
-                                    renderInput={(params) => <TextField {...params} />}/> 
-                            </Stack>
-                            <FormControl>
+                    <form onSubmit={postExpression}>
+                        <Stack spacing={3}>
+                            <TextField
+                                required
+                                id="outlined-basic"
+                                label="Insira uma expressão"
+                                variant="outlined"
+                                value={valueSearchExpression}
+                                onChange={handleChangeSearchExpression}
+                                InputProps={{
+                                    endAdornment: <InputAdornment position="end"><SearchIcon />
+                                    </InputAdornment>
+                                }} />
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <Stack direction="row" spacing={3}>
+                                    <DatePicker label="Início"
+                                        inputFormat="DD/MM/YYYY"
+                                        value={valueDatePickerInicio}
+                                        onChange={(newDateInicio: any) => {
+                                            if (newDateInicio == undefined) {
+                                                setValueDatePickerInicio(dayjs())
+                                                console.log(valueDatePickerInicio)
+                                            }
+                                            else {
+                                                setValueDatePickerInicio(newDateInicio)
+                                            }
+                                        }}
+                                        renderInput={(params) => <TextField {...params} />} />
+                                    <DatePicker label="Fim"
+                                        inputFormat="DD/MM/YYYY"
+                                        value={valueDatePickerFinal}
+                                        onChange={(newDateFinal: any) => {
+                                            if (newDateFinal == undefined) {
+                                                setValueDatePickerFinal(dayjs())
+                                                console.log(valueDatePickerFinal)
+                                            }
+                                            else {
+                                                setValueDatePickerFinal(newDateFinal)
+                                            }
+                                        }}
+                                        renderInput={(params) => <TextField {...params} />} />
+                                </Stack>
+                                <FormControl>
                                     <FormLabel id="order-by-type-group-label">
                                         Tipos de ordenação
                                     </FormLabel>
-                                    <RadioGroup 
+                                    <RadioGroup
                                         name="order-by-type-group"
                                         aria-labelledby="order-by-type-group-label"
-                                        onChange = {handleChangeRadio}
-                                        value = {valueRadio}>
-                                            <FormControlLabel control={<Radio/>} label = "Mais recentes" value="recency"/>
-                                            <FormControlLabel control={<Radio/>} label = "Mais relevantes" value="relevancy"/>
+                                        onChange={handleChangeRadio}
+                                        value={valueRadio}>
+                                        <FormControlLabel control={<Radio required />} label="Mais recentes" value="recency" />
+                                        <FormControlLabel control={<Radio />} label="Mais relevantes" value="relevancy" />
                                     </RadioGroup>
                                 </FormControl>
-                        </LocalizationProvider>
-                    </Stack>
-                    <Button onClick={postExpression} variant="contained">Baixar Ocorrrências</Button>
+                            </LocalizationProvider>
+                            <Button type="submit" variant="contained">Pesquisar expressões</Button>
+                        </Stack>
+                        <Button variant="contained">Baixar Ocorrrências</Button>
+                    </form>
                 </Container>
             </div>
         </div>

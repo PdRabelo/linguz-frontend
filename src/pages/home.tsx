@@ -26,13 +26,14 @@ function Home() {
     const [alertTextSuccess, setAlertSuccess] = useState("")
     const [alertSuccessIsOpen, setAlertSuccesIsOpen] = useState(false)
     const [linearShow, setLinearShow] = useState(false)
-
+    const [allTweets, setAlltweets] = useState(Array <string>)
 
     async function downloadTextFile() {
-        const response = await axios.post("http://localhost:3001/api/v1/download", {
-            "fileData": "eu adoro meus amigos de serviço, Lu levou o macarrão integral hoje pra eu comer no almoço, ainda colocou carne moída (que ela não gosta, só pra ficar mais gostoso pra mim) e um bife de porco maravilhoso. É sobre ❤\n\npoxa eu adoro meus amigos\n\nMds eu adoro meus amigos tá doido",
+        try {
+            const response = await axios.post("http://localhost:3001/api/v1/download", {
+            "fileDataRaw": allTweets,
             "fileType": "txt",
-            "fileName": "asdsaf"
+            "fileName": `${valueSearchExpression.replace(/ /g,'')}_${dayjs().unix()}`
         }, { responseType: 'blob' });
 
         const type = response.headers['content-type']
@@ -40,8 +41,14 @@ function Home() {
 
         const link = document.createElement('a')
         link.href = window.URL.createObjectURL(blob)
-        link.download = 'test.txt'
+        link.download = `${valueSearchExpression.replace(/ /g,'')}_${dayjs().unix()}.txt`
         link.click()
+        }
+        catch (error: any) {
+            setAlertText(`${error.response.data.data} : ${error.response.data.errorDetails}`)
+            setIsOpen(true)
+        }
+        
     }
 
     function validFieldValue() {
@@ -55,11 +62,12 @@ function Home() {
     }
 
     async function postExpression(event: FormEvent<HTMLFormElement>) {
+
         event.preventDefault()
         setLinearShow(true)
+        let allTweetsArray: string[] = [];
         if (validFieldValue()) {
             let response
-            let allTweets: string[] = [];
             try {
                 response = await axios.post("http://localhost:3001/api/v1/search", {
                     query: valueSearchExpression,
@@ -67,25 +75,26 @@ function Home() {
                         start_time: valueDatePickerInicio?.toISOString(),
                         end_time: valueDatePickerFinal?.toISOString(),
                         sort_order: valueRadio,
-                        max_result: 100
+                        max_result: 500
                     }
                 });
                 if(response.status == 200 && response.data.data.meta.result_count > 0){
                     setButton(false)
                     setAlertSuccesIsOpen(true)
-                    setAlertSuccess(`${response.data.data.meta.result_count} occurrences were found`)
+                    setAlertSuccess(`${response.data.data.meta.result_count} ocorrencias foram encontradas`)
+                    
                 }
                 else if(response.status == 200 && response.data.data.meta.result_count == 0){
                     setAlertSuccesIsOpen(true)
-                    setAlertSuccess(`${response.data.data.meta.result_count} occurrences were found`)
+                    setAlertSuccess(`${response.data.data.meta.result_count} ocorrencias foram encontradas`)
                 }
 
                 if(response.status === 200) {
                     response.data.data.tweets.forEach((element: { text: string; }) => {
-                        allTweets.push(element.text);
+                        allTweetsArray.push(element.text);
                     });
+                    setAlltweets(allTweetsArray)
                 }
-                console.log(allTweets);
             }
             catch (error: any) {
                 setAlertText(`${error.response.data.data} : ${error.response.data.errorDetails}`)
@@ -187,7 +196,7 @@ function Home() {
                                     onClose={() =>{
                                         setAlertSuccesIsOpen(false)
                                     }}>
-                                    <AlertTitle>Research is completed!</AlertTitle>
+                                    <AlertTitle>Pesquisa completa!</AlertTitle>
                                     {alertTextSuccess}
                                 </Alert>
                             </Collapse>

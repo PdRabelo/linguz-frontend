@@ -1,9 +1,14 @@
 import Home from "./pages/home"
+import ModalTerms from "./components/modalTerms"
 import "./index.css"
 
 function App() {
   return (
-    <Home/>
+    <div>
+      <ModalTerms/>
+      <Home/>
+    </div>
+    
   );
 }
 

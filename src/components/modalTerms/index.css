@@ -1,0 +1,11 @@
+.center-all{
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+#quote{
+    margin-top: 4%;
+    padding: 3%;
+    background-color: rgb(220, 230, 241);
+}

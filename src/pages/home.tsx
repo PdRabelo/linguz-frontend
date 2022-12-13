@@ -59,6 +59,7 @@ function Home() {
         setLinearShow(true)
         if (validFieldValue()) {
             let response
+            let allTweets: string[] = [];
             try {
                 response = await axios.post("http://localhost:3001/api/v1/search", {
                     query: valueSearchExpression,
@@ -78,6 +79,13 @@ function Home() {
                     setAlertSuccesIsOpen(true)
                     setAlertSuccess(`${response.data.data.meta.result_count} occurrences were found`)
                 }
+
+                if(response.status === 200) {
+                    response.data.data.tweets.forEach((element: { text: string; }) => {
+                        allTweets.push(element.text);
+                    });
+                }
+                console.log(allTweets);
             }
             catch (error: any) {
                 setAlertText(`${error.response.data.data} : ${error.response.data.errorDetails}`)

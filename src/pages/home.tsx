@@ -30,7 +30,7 @@ function Home() {
 
     async function downloadTextFile() {
         try {
-            const response = await axios.post("http://localhost:3001/api/v1/download", {
+            const response = await axios.post("https://linguz-api.onrender.com/api/v1/download", {
             "fileDataRaw": allTweets,
             "fileType": "txt",
             "fileName": `${valueSearchExpression.replace(/ /g,'')}_${dayjs().unix()}`
@@ -69,7 +69,7 @@ function Home() {
         if (validFieldValue()) {
             let response
             try {
-                response = await axios.post("http://localhost:3001/api/v1/search", {
+                response = await axios.post("https://linguz-api.onrender.com/api/v1/search", {
                     query: valueSearchExpression,
                     options : {
                         start_time: valueDatePickerInicio?.toISOString(),

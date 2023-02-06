@@ -1,4 +1,5 @@
 import React, { FormEvent, useState } from "react";
+import https from 'https'
 import Header from "../components/header"
 import { Container, } from "@mui/system";
 import TextField from "@mui/material/TextField";
@@ -28,13 +29,19 @@ function Home() {
     const [linearShow, setLinearShow] = useState(false)
     const [allTweets, setAlltweets] = useState(Array <string>)
 
+
+    const agent = new https.Agent({  
+        rejectUnauthorized: false
+      });
+      
     async function downloadTextFile() {
         try {
             const response = await axios.post("https://54.237.55.139:3001/api/v1/download", {
             "fileDataRaw": allTweets,
             "fileType": "txt",
             "fileName": `${valueSearchExpression.replace(/ /g,'')}_${dayjs().unix()}`
-        }, { responseType: 'blob' });
+        }, { responseType: 'blob',
+            httpsAgent: agent});
 
         const type = response.headers['content-type']
         const blob = new Blob([response.data], { type: type })
@@ -77,7 +84,7 @@ function Home() {
                         sort_order: valueRadio,
                         max_result: 500
                     }
-                });
+                },{httpsAgent: agent});
                 if(response.status == 200 && response.data.data.meta.result_count > 0){
                     setButton(false)
                     setAlertSuccesIsOpen(true)

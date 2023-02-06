@@ -28,20 +28,14 @@ function Home() {
     const [alertSuccessIsOpen, setAlertSuccesIsOpen] = useState(false)
     const [linearShow, setLinearShow] = useState(false)
     const [allTweets, setAlltweets] = useState(Array <string>)
-
-
-    const agent = new https.Agent({  
-        rejectUnauthorized: false
-      });
-      
+    
     async function downloadTextFile() {
         try {
-            const response = await axios.post("https://54.237.55.139:3001/api/v1/download", {
+            const response = await axios.post("http://54.237.55.139:3001/api/v1/download", {
             "fileDataRaw": allTweets,
             "fileType": "txt",
             "fileName": `${valueSearchExpression.replace(/ /g,'')}_${dayjs().unix()}`
-        }, { responseType: 'blob',
-            httpsAgent: agent});
+        }, { responseType: 'blob'});
 
         const type = response.headers['content-type']
         const blob = new Blob([response.data], { type: type })
@@ -76,7 +70,7 @@ function Home() {
         if (validFieldValue()) {
             let response
             try {
-                response = await axios.post("https://54.237.55.139:3001/api/v1/search", {
+                response = await axios.post("http://54.237.55.139:3001/api/v1/search", {
                     query: valueSearchExpression,
                     options : {
                         start_time: valueDatePickerInicio?.toISOString(),
@@ -84,7 +78,7 @@ function Home() {
                         sort_order: valueRadio,
                         max_result: 500
                     }
-                },{httpsAgent: agent});
+                });
                 if(response.status == 200 && response.data.data.meta.result_count > 0){
                     setButton(false)
                     setAlertSuccesIsOpen(true)

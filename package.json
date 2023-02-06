@@ -3,10 +3,6 @@
   "homepage": "https://pdrabelo.github.io/linguz-frontend",
   "version": "1.0.0",
   "private": true,
-  "browser": {
-    "http": false,
-    "https": false
-  },
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
@@ -23,6 +19,7 @@
     "@types/react-dom": "^18.0.9",
     "axios": "^1.2.1",
     "dayjs": "^1.11.6",
+    "https": "^1.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",

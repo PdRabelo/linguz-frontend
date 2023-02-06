@@ -1,0 +1,7 @@
+*
+
+!src/
+!public/
+!build/
+!tsconfig.json
+!package.json

@@ -12,5 +12,5 @@ ENV NODE_ENV=prod
 COPY --from=builder --chown=node:node /app/package.json /app/
 WORKDIR /app
 RUN npm install --production=true
-COPY --from=builder --chown=node:node /app/dist dist
+COPY --from=builder --chown=node:node /app/build build
 CMD [ "npm", "run", "start" ]

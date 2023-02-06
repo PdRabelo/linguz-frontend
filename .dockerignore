@@ -1,7 +1,7 @@
 *
 
 !src/
-!babel.config.js
+!public/
+!build/
 !tsconfig.json
-!dist/
 !package.json

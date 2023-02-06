@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import "./index.css"
-import { Box, Button, Checkbox, DialogContentText, DialogTitle, FormControlLabel, FormGroup, Modal, Typography } from "@mui/material";
+import { Button, Checkbox, DialogContentText, DialogTitle, FormControlLabel, FormGroup } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 function ModalTerms(){
 
@@ -15,7 +14,7 @@ function ModalTerms(){
       };
 
     const handleClose = (event: any, reason: any)=>{
-        if(reason &&  reason == "backdropClick")
+        if(reason &&  reason === "backdropClick")
             return;
         setOpen(false)
     }

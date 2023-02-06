@@ -1,12 +1,11 @@
 import React, { FormEvent, useState } from "react";
-import https from 'https'
+
 import Header from "../components/header"
 import { Container, } from "@mui/system";
 import TextField from "@mui/material/TextField";
 import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button';
-import { AlertTitle, Collapse, IconButton, InputAdornment, LinearProgress, RatingClassKey, Stack } from "@mui/material";
-import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import { AlertTitle, Collapse, InputAdornment, LinearProgress, Stack } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -79,13 +78,13 @@ function Home() {
                         max_result: 500
                     }
                 });
-                if(response.status == 200 && response.data.data.meta.result_count > 0){
+                if(response.status === 200 && response.data.data.meta.result_count > 0){
                     setButton(false)
                     setAlertSuccesIsOpen(true)
                     setAlertSuccess(`${response.data.data.meta.result_count} ocorrencias foram encontradas`)
                     
                 }
-                else if(response.status == 200 && response.data.data.meta.result_count == 0){
+                else if(response.status === 200 && response.data.data.meta.result_count === 0){
                     setAlertSuccesIsOpen(true)
                     setAlertSuccess(`${response.data.data.meta.result_count} ocorrencias foram encontradas`)
                 }
@@ -148,7 +147,7 @@ function Home() {
                                         inputFormat="DD/MM/YYYY"
                                         value={valueDatePickerInicio}
                                         onChange={(newDateInicio: any) => {
-                                            if (newDateInicio == undefined) {
+                                            if (newDateInicio === undefined) {
                                                 setValueDatePickerInicio(dayjs().startOf('day'))
                                             }
                                             else {
@@ -160,13 +159,13 @@ function Home() {
                                         inputFormat="DD/MM/YYYY"
                                         value={valueDatePickerFinal}
                                         onChange={(newDateFinal: any) => {
-                                            if (newDateFinal == undefined) {
+                                            if (newDateFinal === undefined) {
                                                 setValueDatePickerFinal(dayjs().endOf('day'))
                                             }
                                             else {
                                                 setValueDatePickerFinal(newDateFinal)
                                             }
-                                            if(newDateFinal.startOf('day') == dayjs().startOf('day')){
+                                            if(newDateFinal.startOf('day') === dayjs().startOf('day')){
                                                 setValueDatePickerFinal(dayjs())
                                             }
                                         }}

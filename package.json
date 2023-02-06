@@ -3,6 +3,10 @@
   "homepage": "https://pdrabelo.github.io/linguz-frontend",
   "version": "1.0.0",
   "private": true,
+  "browser": {
+    "http": false,
+    "https": false
+  },
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",

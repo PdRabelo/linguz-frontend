@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/static/css/main.a0196ec5.css",
-    "main.js": "/static/js/main.de8dcc61.js",
-    "index.html": "/index.html",
-    "main.a0196ec5.css.map": "/static/css/main.a0196ec5.css.map",
-    "main.de8dcc61.js.map": "/static/js/main.de8dcc61.js.map"
+    "main.css": "/linguz-frontend/static/css/main.a0196ec5.css",
+    "main.js": "/linguz-frontend/static/js/main.b1a87543.js",
+    "index.html": "/linguz-frontend/index.html",
+    "main.a0196ec5.css.map": "/linguz-frontend/static/css/main.a0196ec5.css.map",
+    "main.b1a87543.js.map": "/linguz-frontend/static/js/main.b1a87543.js.map"
   },
   "entrypoints": [
     "static/css/main.a0196ec5.css",
-    "static/js/main.de8dcc61.js"
+    "static/js/main.b1a87543.js"
   ]
 }

@@ -1,8 +1,0 @@
-version: '3.9'
-services:
-  api:
-    container_name: linguz-frontend
-    build: .
-    restart: always
-    ports:
-      - 80:80

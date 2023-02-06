@@ -2,7 +2,7 @@ FROM node:16-alpine as builder
 USER node
 COPY --chown=node:node . /app/
 WORKDIR /app
-RUN npm install && npm build
+RUN npm install && npm run build
 
 FROM node:16-alpine
 RUN apk add --no-cache tzdata
@@ -13,4 +13,4 @@ COPY --from=builder --chown=node:node /app/package.json /app/
 WORKDIR /app
 RUN npm install --production=true
 COPY --from=builder --chown=node:node /app/dist dist
-CMD [ "npm", "start" ]
+CMD [ "npm", "run", "start" ]
